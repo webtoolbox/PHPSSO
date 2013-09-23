@@ -8,7 +8,7 @@ require_once dirname(__FILE__).'/forum_sso_functions.php';
 
 $user = array();
 // Fill in the user information in a way that websitetoolbox forum can understand.
-$user['user'] = '';
+$user['user'] = 'john';
 
 // Call forum signin function to send request.
 // Get authtoken $_SESSION['authtoken'] that can be further used.
