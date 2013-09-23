@@ -1,5 +1,8 @@
 <?php
 require_once dirname(__FILE__).'/forum_sso_functions.php';
+// Important Note:
+// You also need to update forum username on line 6 in forum_sso_functions.php.
+// You also need to update forum API KEY on line 8 in forum_sso_functions.php.
 
 // YOUR CODE HERE.
 
@@ -13,7 +16,7 @@ $user['pw'] = '';
 $user['email'] = 'john.php@anonymous.com';	
 
 // Call forum signup function to send request.
-$response = forumSignup($user);
-// Response has user's registration success status
-echo $response;
+// Return user registeration status as "Registration Complete" / Register Failed Message.
+$register_staus = forumSignup($user);
+echo $register_staus;
 ?>
