@@ -14,11 +14,11 @@ define("API_KEY","rzbHTaTbCeO");
 function doHTTPCall($URL){
 	if (_checkBasicFunctions("curl_init,curl_setopt,curl_exec,curl_close")) {
 		$ch = curl_init("http://".HOST.$URL);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $response = curl_exec($ch);      
-        curl_close($ch);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$response = curl_exec($ch);      
+		curl_close($ch);
 	} else if (_checkBasicFunctions("fsockopen,fputs,feof,fread,fgets,fclose")) {
 		$fsock = fsockopen(HOST, 80, $errno, $errstr, 30);
 		if (!$fsock) {
@@ -54,14 +54,14 @@ function filter_xml($matches) {
 #parmeter: Accept parameter functionslist with values such as  'fsockopen,fputs,feof,fread,fgets,fclose'
 function _checkBasicFunctions($functionList)
 {
-  $functions = split(",",$functionList);
-  foreach ($functions as $key=>$val) {
-  	$function = trim($val);
-  	if (!function_exists($function)) {
-		return false;
+	$functions = split(",",$functionList);
+	foreach ($functions as $key=>$val) {
+		$function = trim($val);
+		if (!function_exists($function)) {
+			return false;
+		}
 	}
-  }
-  return true;
+	return true;
 } 
 
 #Purpose: Function for registering a new user on websitetoolbox forum. 
