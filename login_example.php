@@ -4,15 +4,18 @@ require_once dirname(__FILE__).'/forum_sso_functions.php';
 // You also need to update forum username on line 7 in forum_sso_functions.php.
 // You also need to update forum API KEY on line 9 in forum_sso_functions.php.
 
-// YOUR CODE HERE.
+// Your code to process the login for the user on your website goes here.
 
-$user = array();
 // Fill in the user information in a way that websitetoolbox forum can understand.
+$user = array();
+// After successful login to your website, assign the same logged-in username which also stored in the websitetoolbox forum.
 $user['user'] = 'john';
 
-// Call forum signin function to send request.
-// Get authtoken $_SESSION['authtoken'] that can be further used.
-// Return login status as "Login Successful" / Logout Failed Message.
+// function called for sign in on the websitetoolbox forum if username exist on user's site as well as on Website Toolbox forum.
+// You can also get authtoken $_SESSION['authtoken'] that can be further used for hiding "login" page after successful login and displaying "logout" page on your website.
+// The function will return login status as "Login Successful" / Logout Failed Message from websitetoolbox forum.
 $login_status = forumSignin($user);
-echo $login_status;
+if($login_status == 'Login Successful') {
+	// Redirect to secure members-only area since login was successful.
+}
 ?>
