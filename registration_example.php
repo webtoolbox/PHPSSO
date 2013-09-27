@@ -28,6 +28,6 @@ $user['email'] = 'john.php@anonymous.com';
 // Return user registeration status as "Registration Complete" / Register Failed Message.
 $register_staus = forumSignup($user);
 if($register_staus == 'Registration Complete') {
-	// Redirect to user's page since registeration was successful.
+	// Redirect to your desired page since registeration was successful.
 }
 ?>

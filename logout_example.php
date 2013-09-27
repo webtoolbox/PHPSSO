@@ -7,5 +7,5 @@ require_once dirname(__FILE__).'/forum_sso_functions.php';
 // Return logout out status as "Logout Successful" / "Logout Failed" from websitetoolbox forum.
 $logout_status = forumSignout();
 if($logout_status == 'Logout Successful') {
-	// Redirect to user's area since logout was successful.}
+	// Redirect to your desired page since logout was successful.}
 ?>
