@@ -52,8 +52,7 @@ function filter_xml($matches) {
 
 #Purpose: Check php basic functions exist or not
 #parmeter: Accept parameter functionslist with values such as  'fsockopen,fputs,feof,fread,fgets,fclose'
-function _checkBasicFunctions($functionList)
-{
+function _checkBasicFunctions($functionList) {
 	$functions = split(",",$functionList);
 	foreach ($functions as $key=>$val) {
 		$function = trim($val);
