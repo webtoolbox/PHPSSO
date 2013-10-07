@@ -1,67 +1,14 @@
 <?php
 # This file contains functions for the websitetoolbox.com forum single sign on.
-# Initialize session.
-session_start(); 
 
 # Replace USERNAME with your Website Toolbox username. If you are using a managed domain or a subdomain, use that instead of USERNAME.websitetoolbox.com. 
 define("HOST","USERNAME.websitetoolbox.com");
 # Get The API Key from the Settings -> Single Sign On section of the Website Toolbox admin area.
 define("API_KEY","rzbHTaTbCeO");
 
-#Purpose: Create a request using curl or file and getting response from the Website Toolbox.
-#parmeter: request URL which will use to make curl request to websitetoolbox forum.
-#return: return response from the Website Toolbox forum.
-function doHTTPCall($URL){
-	if (_checkBasicFunctions("curl_init,curl_setopt,curl_exec,curl_close")) {
-		$ch = curl_init("http://".HOST.$URL);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$response = curl_exec($ch);      
-		curl_close($ch);
-	} else if (_checkBasicFunctions("fsockopen,fputs,feof,fread,fgets,fclose")) {
-		$fsock = fsockopen(HOST, 80, $errno, $errstr, 30);
-		if (!$fsock) {
-			echo "Error! $errno - $errstr";
-		} else {
-			$headers .= "POST $URL HTTP/1.1\r\n";
-			$headers .= "HOST: ".HOST."\r\n";
-			$headers .= "Connection: close\r\n\r\n";
-			fputs($fsock, $headers);
-			// Needed to omit extra initial information
-			$get_info = false;
-			while (!feof($fsock)) {
-				if ($get_info) {
-					$response .= fread($fsock, 1024);
-				} else {
-					if (fgets($fsock, 1024) == "\r\n") {
-						$get_info = true;
-					}
-				}
-			}
-			fclose($fsock);
-		}
-	}
-	return $response;
-}
-
-#Purpose: Function for filtering response xml
-function filter_xml($matches) {
-	return trim(htmlspecialchars($matches[1]));
-} 
-
-#Purpose: Check php basic functions exist or not
-#parmeter: Accept parameter functionslist with values such as  'fsockopen,fputs,feof,fread,fgets,fclose'
-function _checkBasicFunctions($functionList) {
-	$functions = split(",",$functionList);
-	foreach ($functions as $key=>$val) {
-		$function = trim($val);
-		if (!function_exists($function)) {
-			return false;
-		}
-	}
-	return true;
-} 
+# Initializing session if it is not started in client project files to assign SSO login authtoken into $_SESSION['authtoken']. The $_SESSION['authtoken'] is used in forumSignout function to logout from websitetoolbox forum.
+# Checking current session status if it is not exists in client project files then session will be started.
+if (!$_SESSION) {session_start();}
 
 #Purpose: Function for registering a new user on websitetoolbox forum. 
 #parmeter: Param $user an array containing information about the new user. The array user will contain mandatory values (member, pw and email) which will be used to build URL query string to register a new user on websitetoolbox forum. The array $user can also contain optional value such as name, avatar, profile picture etc.
@@ -138,4 +85,59 @@ function forumSignout() {
 		return "Logout Failed";
 	}	
 }
+
+#Purpose: Create a request using curl or file and getting response from the Website Toolbox.
+#parmeter: request URL which will use to make curl request to websitetoolbox forum.
+#return: return response from the Website Toolbox forum.
+function doHTTPCall($URL){
+	if (_checkBasicFunctions("curl_init,curl_setopt,curl_exec,curl_close")) {
+		$ch = curl_init("http://".HOST.$URL);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$response = curl_exec($ch);      
+		curl_close($ch);
+	} else if (_checkBasicFunctions("fsockopen,fputs,feof,fread,fgets,fclose")) {
+		$fsock = fsockopen(HOST, 80, $errno, $errstr, 30);
+		if (!$fsock) {
+			echo "Error! $errno - $errstr";
+		} else {
+			$headers .= "POST $URL HTTP/1.1\r\n";
+			$headers .= "HOST: ".HOST."\r\n";
+			$headers .= "Connection: close\r\n\r\n";
+			fputs($fsock, $headers);
+			// Needed to omit extra initial information
+			$get_info = false;
+			while (!feof($fsock)) {
+				if ($get_info) {
+					$response .= fread($fsock, 1024);
+				} else {
+					if (fgets($fsock, 1024) == "\r\n") {
+						$get_info = true;
+					}
+				}
+			}
+			fclose($fsock);
+		}
+	}
+	return $response;
+}
+
+#Purpose: Function for filtering response xml
+function filter_xml($matches) {
+	return trim(htmlspecialchars($matches[1]));
+} 
+
+#Purpose: Check php basic functions exist or not
+#parmeter: Accept parameter functionslist with values such as  'fsockopen,fputs,feof,fread,fgets,fclose'
+function _checkBasicFunctions($functionList) {
+	$functions = split(",",$functionList);
+	foreach ($functions as $key=>$val) {
+		$function = trim($val);
+		if (!function_exists($function)) {
+			return false;
+		}
+	}
+	return true;
+} 
 ?>

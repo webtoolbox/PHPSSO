@@ -1,8 +1,8 @@
 <?php
 require_once dirname(__FILE__).'/forum_sso_functions.php';
 // Important Note:
-// You also need to update forum username on line 7 in forum_sso_functions.php.
-// You also need to update forum API KEY on line 9 in forum_sso_functions.php.
+// You also need to update forum username on line 5 in forum_sso_functions.php.
+// You also need to update forum API Key on line 7 in forum_sso_functions.php.
 
 
 // Your code to process the registration for the user on your website goes here.
