@@ -54,8 +54,10 @@ function forumSignin($user) {
 		 $user[$key] = '';
 	}
 	# Generating a URL-encoded query string from the $user array.	
-	$parameters = http_build_query($user, NULL, '&'); 
-	$URL = "/register/setauthtoken?apikey=".API_KEY."&".$parameters;
+	$login_parameters = http_build_query($user, NULL, '&');
+	# user details stored in session which will used later in forumSignout function. 
+	$_SESSION['login_parameters'] = $login_parameters;
+	$URL = "/register/setauthtoken?apikey=".API_KEY."&".$login_parameters;
 	# making a request using curl or file and getting response from the Website Toolbox.
 	$response_xml = doHTTPCall($URL);
 	$response_xml = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response_xml);
@@ -82,7 +84,22 @@ function forumSignout() {
 		$_SESSION['authtoken'] = '';
 		return "Logout Successful";	
 	} else {
-		return "Logout Failed";
+		# If authtoken is missing from session variable then making a HTTP request using curl and getting authtoken from the Website Toolbox. 
+		# Passing user details via $_SESSION['login_parameters'] which stored in session during user login.
+		# If authtoken not null then the "register/logout?authtoken" is loaded with IMG src to logout user from websitetoolbox forum and return sign out status message as "Logout Successful"
+		# If authtoken returned as null then appropriate error message will be returned. 
+		$URL = "/register/getauthtoken?apikey=".API_KEY."&".$_SESSION['login_parameters'];
+		$response_xml = doHTTPCall($URL);
+		$response_xml = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response_xml);
+		$response_xml = simplexml_load_string($response_xml);	
+		$authtoken = htmlentities($response_xml->authtoken);
+		$errormessage = htmlentities($response_xml->errormessage);
+		if($authtoken) {
+			echo "<img src='http://".HOST."/register/logout?authtoken=".$authtoken."' border='0' width='1' height='1' alt=''>";
+			return "Logout Successful";
+		} else {
+			return $errormessage;
+		}		
 	}	
 }
 
