@@ -2,9 +2,9 @@
 # This file contains functions for the websitetoolbox.com forum single sign on.
 
 # Replace USERNAME with your Website Toolbox username. If you are using a managed domain or a subdomain, use that instead of USERNAME.websitetoolbox.com. 
-define("HOST","USERNAME.websitetoolbox.com");
+define("HOST","http://classiflyds.forumchatter.com");
 # Get The API Key from the Settings -> Single Sign On section of the Website Toolbox admin area.
-define("API_KEY","rzbHTaTbCeO");
+define("API_KEY","Tjl48kRwJ4u");
 
 # Initializing session if it is not started in client project files to assign SSO login authtoken into $_SESSION['authtoken']. The $_SESSION['authtoken'] is used in forumSignout function to logout from websitetoolbox forum.
 # Checking current session status if it is not exists in client project files then session will be started.
