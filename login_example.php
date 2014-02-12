@@ -9,7 +9,9 @@ require_once dirname(__FILE__).'/forum_sso_functions.php';
 // Fill in the user information in a way that websitetoolbox forum can understand.
 $user = array();
 // After successful login to your website, assign the same logged-in username which also stored in the websitetoolbox forum.
+// You can also login using an email address. For example: $user['user'] = 'john@gmail.com';
 $user['user'] = 'john';
+
 
 // function called for sign in on the websitetoolbox forum if username exist on user's site as well as on Website Toolbox forum.
 // The function will print an IMG tag to get login on websitetoolbox forum.
