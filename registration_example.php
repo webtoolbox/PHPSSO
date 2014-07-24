@@ -24,8 +24,8 @@ $user['email'] = 'john.php@anonymous.com';
 // You can assign optional registration fields to '$user' array.
 // For example: $user['name'] = 'John wright';
 
-// You can also assign optional usergroupid field if you want to register user into any specific usergroup
-// For example: $user['usergroupid'] = '489375';
+// You can also assign optional usergroupid field if you want to register user into any specific usergroup (Uses Registered Users or Pending Approval groups by default)
+// For example: $user['usergroupid'] = '489375'; 
 
 // function called for registering a new user on websitetoolbox forum.
 // Return user registeration status as "Registration Complete" / Register Failed Message.
