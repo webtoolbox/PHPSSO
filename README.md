@@ -14,7 +14,7 @@ The following files are included in this repo.
 * [`logout_example.php`](https://github.com/webtoolbox/PHPSSO/blob/master/logout_example.php)
   This file offers an example usage for SSO logout. You can customize this page or start from scratch.
   
-  
+Note that PHP's cURL extension is required. That is installed on most servers by default.
   
   
  
