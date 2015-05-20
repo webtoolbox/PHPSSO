@@ -12,11 +12,12 @@ $user = array();
 // You can also login using an email address. For example: $user['user'] = 'john@gmail.com';
 $user['user'] = 'john';
 
-// You can also pass email address (optional). It will create forum account automatically in cases where the specified forum account doesn't already exist.
+// You can also pass the user's email address (optional). It will automatically create the forum account in cases where the specified forum account doesn't already exist.
 $user['email'] = 'john@gmail.com';
 
-// You can also pass plain password (Optional). It will set the account's password, in case you would not pass the password then an account is created without a password on the Forum. 
-// If you do not pass the password then user would not be able to login directly to the forum unless they first reset their password on the login page. 
+// You can also pass the plain-text password (Optional) to set the account's password in cases where a new account needs to be created because it doesn't already exist.
+// If you choose not to pass the plain-text password with your request and a new account needs to be created, it would be created without a password.
+// In that case the user would not be able to login directly into the forum unless they first reset their password on the login page. 
 // SSO login would work smoothly even without the user's account having a password.
 $user['pw'] = 'john123';
 
