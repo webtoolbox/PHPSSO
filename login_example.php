@@ -12,6 +12,14 @@ $user = array();
 // You can also login using an email address. For example: $user['user'] = 'john@gmail.com';
 $user['user'] = 'john';
 
+// You can also pass email address (optional). It will create forum account automatically in cases where the specified forum account doesn't already exist.
+$user['email'] = 'john@gmail.com';
+
+// You can also pass plain password (Optional). It will set the account's password, in case you would not pass the password then an account is created without a password on the Forum. 
+// If you do not pass the password then user would not be able to login directly to the forum unless they first reset their password on the login page. 
+// SSO login would work smoothly even without the user's account having a password.
+$user['pw'] = 'john123';
+
 
 // function called for sign in on the websitetoolbox forum if username exist on user's site as well as on Website Toolbox forum.
 // The function will print an IMG tag to get login on websitetoolbox forum.
