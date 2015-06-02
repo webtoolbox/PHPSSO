@@ -103,58 +103,22 @@ function forumSignout() {
 	}	
 }
 
-#Purpose: Create a request using curl or file and getting response from the Website Toolbox.
+#Purpose: Create a request using curl and getting response from the Website Toolbox.
 #parmeter: request URL which will use to make curl request to websitetoolbox forum.
 #return: return response from the Website Toolbox forum.
 function doHTTPCall($URL){
-	if (_checkBasicFunctions("curl_init,curl_setopt,curl_exec,curl_close")) {
-		$ch = curl_init("http://".HOST.$URL);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$response = curl_exec($ch);      
-		curl_close($ch);
-	} else if (_checkBasicFunctions("fsockopen,fputs,feof,fread,fgets,fclose")) {
-		$fsock = fsockopen(HOST, 80, $errno, $errstr, 30);
-		if (!$fsock) {
-			echo "Error! $errno - $errstr";
-		} else {
-			$headers .= "POST $URL HTTP/1.1\r\n";
-			$headers .= "HOST: ".HOST."\r\n";
-			$headers .= "Connection: close\r\n\r\n";
-			fputs($fsock, $headers);
-			// Needed to omit extra initial information
-			$get_info = false;
-			while (!feof($fsock)) {
-				if ($get_info) {
-					$response .= fread($fsock, 1024);
-				} else {
-					if (fgets($fsock, 1024) == "\r\n") {
-						$get_info = true;
-					}
-				}
-			}
-			fclose($fsock);
-		}
-	}
+	/* Sent HTTP request on the website Toolbox from from your sever. */
+	$ch = curl_init("http://".HOST.$URL);
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	$response = curl_exec($ch);      
+	curl_close($ch);
 	return $response;
 }
 
 #Purpose: Function for filtering response xml
 function filter_xml($matches) {
 	return trim(htmlspecialchars($matches[1]));
-} 
-
-#Purpose: Check php basic functions exist or not
-#parmeter: Accept parameter functionslist with values such as  'fsockopen,fputs,feof,fread,fgets,fclose'
-function _checkBasicFunctions($functionList) {
-	$functions = split(",",$functionList);
-	foreach ($functions as $key=>$val) {
-		$function = trim($val);
-		if (!function_exists($function)) {
-			return false;
-		}
-	}
-	return true;
 } 
 ?>

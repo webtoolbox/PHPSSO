@@ -13,6 +13,7 @@ The following files are included in this repo.
   This file offers an example usage for SSO login. You can customize this page or start from scratch.
 * [`logout_example.php`](https://github.com/webtoolbox/PHPSSO/blob/master/logout_example.php)
   This file offers an example usage for SSO logout. You can customize this page or start from scratch.
+* This example uses <a href="http://php.net/manual/en/book.curl.php</a>cURL</a> to make HTTP requests. Most servers have cURL pre-installed. If you don't have the cURL php extension installed on your server, you can <a href="http://php.net/manual/en/curl.installation.php>install it</a> or use a different method to make HTTP requests.   
   
 Note that PHP's cURL extension is required. That is installed on most servers by default.
   
