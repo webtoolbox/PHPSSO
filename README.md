@@ -1,7 +1,7 @@
 PHPSSO
 ======
 
-Contains client files for integrating Single Sign On and Single Registration in PHP with a Website Toolbox Forum.
+Contains client files for integrating Single Sign On and Single Registration in PHP with a [`Website Toolbox Forum`](http://www.websitetoolbox.com/forum-hosting/index.html).
 
 The following files are included in this repo.
 
