@@ -67,6 +67,8 @@ function forumSignin($user) {
 	if ($authtoken) {
 		$_SESSION['authtoken'] = $authtoken;
 		echo "<img src='http://".HOST."/register/dologin?authtoken=$authtoken' border='0' width='1' height='1' alt=''>";
+		# You can optionally redirect or link to http://".HOST."/?authtoken=$authtoken instead of using the IMG tag, 
+		# or you can use both because the IMG tag will fail in browsers that block third-party cookies.
 		return "Login Successful";	
 	} else {
 		return $response_xml->errormessage;
