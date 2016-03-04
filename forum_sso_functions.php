@@ -66,7 +66,7 @@ function forumSignin($user) {
 	# Check authtoken for null. If authtoken not null then load with "register/dologin?authtoken" url through IMG src to sign in on websitetoolbox forum.
 	if ($authtoken) {
 		$_SESSION['authtoken'] = $authtoken;
-		echo "<img src='http://".HOST."/register/dologin?authtoken=$authtoken' border='0' width='1' height='1' alt=''>";
+		echo "<img src='//".HOST."/register/dologin?authtoken=$authtoken' border='0' width='1' height='1' alt=''>";
 		# You can optionally redirect or link to http://".HOST."/?authtoken=$authtoken instead of using the IMG tag, 
 		# or you can use both because the IMG tag will fail in browsers that block third-party cookies.
 		return "Login Successful";	
@@ -81,7 +81,7 @@ function forumSignin($user) {
 function forumSignout() {
 	# Check for authtoken value. If authtoken not null then load /register/logout?authtoken url through IMG src to sign out from websitetoolbox forum.
 	if($_SESSION['authtoken']) {
-		echo "<img src='http://".HOST."/register/logout?authtoken=".$_SESSION['authtoken']."' border='0' width='1' height='1' alt=''>";
+		echo "<img src='//".HOST."/register/logout?authtoken=".$_SESSION['authtoken']."' border='0' width='1' height='1' alt=''>";
 		# Reset authtoken session variable after sign out.
 		$_SESSION['authtoken'] = '';
 		return "Logout Successful";	
@@ -97,7 +97,7 @@ function forumSignout() {
 		$authtoken = htmlentities($response_xml->authtoken);
 		$errormessage = htmlentities($response_xml->errormessage);
 		if($authtoken) {
-			echo "<img src='http://".HOST."/register/logout?authtoken=".$authtoken."' border='0' width='1' height='1' alt=''>";
+			echo "<img src='//".HOST."/register/logout?authtoken=".$authtoken."' border='0' width='1' height='1' alt=''>";
 			return "Logout Successful";
 		} else {
 			return $errormessage;
