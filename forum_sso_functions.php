@@ -29,8 +29,8 @@ function forumSignup($user) {
 	// decode the JSON data
 	$json_response = json_decode($response);
 	// Check for valid JSON
-	if(is_object($json_response)) {		
-		$response = $json_response;		
+	if(is_object($json_response) && $json_response->{'userid'}) {
+		return "Registration Complete";			
 	} else {
 		$response_xml = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response);
 		$response_xml = simplexml_load_string($response_xml);	
@@ -41,9 +41,10 @@ function forumSignup($user) {
 			$bad_string = strpos($response,'&lt;');
 			$response = substr($response, 0, $bad_string-1);
 		}
+		# returning sso register response
+		return $response;		  
 	}
-	# returning sso register response
-	return $response;		  
+	
 }
 
 

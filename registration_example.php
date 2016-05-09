@@ -28,7 +28,7 @@ $user['email'] = 'john.php@anonymous.com';
 // For example: $user['usergroupid'] = '489375'; 
 
 // function called for registering a new user on websitetoolbox f
-if((is_object($register) && $register->{'userid'}) || ($register == 'Registration Complete')) {
+if($register == 'Registration Complete') {
 	// Redirect to your desired page since registeration was successful.
 }
 ?>
