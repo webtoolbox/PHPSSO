@@ -23,17 +23,24 @@ function forumSignup($user) {
 	}
 	# Generating a URL-encoded query string from the $user array.	
 	$parameters = http_build_query($user, NULL, '&');   
-	$URL = "/register/create_account?apikey=".API_KEY."&".$parameters;
+	$URL = "/register/create_account?type=json&apikey=".API_KEY."&".$parameters;
 	# making a request using curl or file and getting response from the Website Toolbox.
 	$response = doHTTPCall($URL);
-	$response_xml = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response);
-	$response_xml = simplexml_load_string($response_xml);	
-	$response = trim(htmlentities($response_xml->error));
-	$full_length = strlen($response);	
-	#Remove HTML tag with content from the message, return from forum if email of user already exist.
-	if(strpos($response,'&lt;')) {
-		$bad_string = strpos($response,'&lt;');
-		$response = substr($response, 0, $bad_string-1);
+	// decode the JSON data
+	$json_response = json_decode($response);
+	// Check for valid JSON
+	if(is_object($json_response)) {		
+		$response = $json_response;		
+	} else {
+		$response_xml = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response);
+		$response_xml = simplexml_load_string($response_xml);	
+		$response = trim(htmlentities($response_xml->error));
+		$full_length = strlen($response);	
+		#Remove HTML tag with content from the message, return from forum if email of user already exist.
+		if(strpos($response,'&lt;')) {
+			$bad_string = strpos($response,'&lt;');
+			$response = substr($response, 0, $bad_string-1);
+		}
 	}
 	# returning sso register response
 	return $response;		  
@@ -57,12 +64,21 @@ function forumSignin($user) {
 	$login_parameters = http_build_query($user, NULL, '&');
 	# user details stored in session which will used later in forumSignout function. 
 	$_SESSION['login_parameters'] = $login_parameters;
-	$URL = "/register/setauthtoken?apikey=".API_KEY."&".$login_parameters;
+	$URL = "/register/setauthtoken?type=json&apikey=".API_KEY."&".$login_parameters;
 	# making a request using curl or file and getting response from the Website Toolbox.
-	$response_xml = doHTTPCall($URL);
-	$response_xml = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response_xml);
-	$response_xml = simplexml_load_string($response_xml);	
-	$authtoken = htmlentities($response_xml->authtoken);
+	$response = doHTTPCall($URL);
+	// decode json data
+	$json_response = json_decode($response);
+	// Check for valid JSON data
+	if(is_object($json_response)) {					
+		$authtoken = $json_response->{'authtoken'};	
+		$error_message = $json_response->{'message'};
+	} else {			
+		$response = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response);
+		$response = simplexml_load_string($response);	
+		$authtoken = htmlentities($response->authtoken);	
+		$error_message = $response->errormessage;
+	}		
 	# Check authtoken for null. If authtoken not null then load with "register/dologin?authtoken" url through IMG src to sign in on websitetoolbox forum.
 	if ($authtoken) {
 		$_SESSION['authtoken'] = $authtoken;
@@ -71,8 +87,8 @@ function forumSignin($user) {
 		# or you can use both because the IMG tag will fail in browsers that block third-party cookies.
 		return "Login Successful";	
 	} else {
-		return $response_xml->errormessage;
-	}  	
+		return $error_message;
+	}
 }
 #Purpose: function for sign out from websitetoolbox forum.
 # It check for $_SESSION['authtoken'] if it's not null then the "register/logout?authtoken" is loaded with IMG src to logout user from websitetoolbox forum.
@@ -90,12 +106,20 @@ function forumSignout() {
 		# Passing user details via $_SESSION['login_parameters'] which stored in session during user login.
 		# If authtoken not null then the "register/logout?authtoken" is loaded with IMG src to logout user from websitetoolbox forum and return sign out status message as "Logout Successful"
 		# If authtoken returned as null then appropriate error message will be returned. 
-		$URL = "/register/getauthtoken?apikey=".API_KEY."&".$_SESSION['login_parameters'];
-		$response_xml = doHTTPCall($URL);
-		$response_xml = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response_xml);
-		$response_xml = simplexml_load_string($response_xml);	
-		$authtoken = htmlentities($response_xml->authtoken);
-		$errormessage = htmlentities($response_xml->errormessage);
+		$URL = "/register/getauthtoken?type=json&apikey=".API_KEY."&".$_SESSION['login_parameters'];
+		$response = doHTTPCall($URL);
+		// decode json data
+		$json_response = json_decode($response);
+		// Check for valid JSON data
+		if(is_object($json_response)) {
+			$authtoken = $json_response->{'authtoken'};	
+			$errormessage = $json_response->{'message'};
+		} else {
+			$response = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response);
+			$response = simplexml_load_string($response);	
+			$authtoken = htmlentities($response->authtoken);
+			$errormessage = htmlentities($response->errormessage);
+		}
 		if($authtoken) {
 			echo "<img src='//".HOST."/register/logout?authtoken=".$authtoken."' border='0' width='1' height='1' alt=''>";
 			return "Logout Successful";
