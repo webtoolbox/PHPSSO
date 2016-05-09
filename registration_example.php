@@ -27,8 +27,10 @@ $user['email'] = 'john.php@anonymous.com';
 // You can also assign optional usergroupid field if you want to register user into any specific usergroup (Uses Registered Users or Pending Approval groups by default)
 // For example: $user['usergroupid'] = '489375'; 
 
-// function called for registering a new user on websitetoolbox f
-if($register == 'Registration Complete') {
+// function called for registering a new user on websitetoolbox forum.
+// Return user registeration status as "Registration Complete" / Register Failed Message.
+$register_staus = forumSignup($user);
+if($register_staus == 'Registration Complete') {
 	// Redirect to your desired page since registeration was successful.
 }
 ?>
