@@ -26,12 +26,10 @@ function forumSignup($user) {
 	$URL = "/register/create_account?type=json&apikey=".API_KEY."&".$parameters;
 	# making a request using curl or file and getting response from the Website Toolbox.
 	$response = doHTTPCall($URL);
-	// decode the JSON data
 	$json_response = json_decode($response);
 	if($json_response->{'userid'}) {
 		return "Registration Complete";
 	} else {
-		// return error message.
 		return $json_response->{'message'};
 	}
 }
@@ -57,7 +55,6 @@ function forumSignin($user) {
 	$URL = "/register/setauthtoken?type=json&apikey=".API_KEY."&".$login_parameters;
 	# making a request using curl or file and getting response from the Website Toolbox.
 	$response = doHTTPCall($URL);
-	// decode json data
 	$json_response = json_decode($response);
 	# Check authtoken for null. If authtoken not null then load with "register/dologin?authtoken" url through IMG src to sign in on websitetoolbox forum.
 	if ($json_response->{'authtoken'}) {
@@ -67,7 +64,6 @@ function forumSignin($user) {
 		# or you can use both because the IMG tag will fail in browsers that block third-party cookies.
 		return "Login Successful";	
 	} else {
-		// return error message.
 		return $json_response->{'message'};
 	}
 }
@@ -89,13 +85,11 @@ function forumSignout() {
 		# If authtoken returned as null then appropriate error message will be returned. 
 		$URL = "/register/getauthtoken?type=json&apikey=".API_KEY."&".$_SESSION['login_parameters'];
 		$response = doHTTPCall($URL);
-		// decode json data
 		$json_response = json_decode($response);
 		if($json_response->{'authtoken'}) {
 			echo "<img src='//".HOST."/register/logout?authtoken=".$json_response->{'authtoken'}."' border='0' width='1' height='1' alt=''>";
 			return "Logout Successful";
 		} else {
-			// return error message.
 			return $json_response->{'message'};
 		}		
 	}	
