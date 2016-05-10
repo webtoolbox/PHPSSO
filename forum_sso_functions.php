@@ -28,23 +28,12 @@ function forumSignup($user) {
 	$response = doHTTPCall($URL);
 	// decode the JSON data
 	$json_response = json_decode($response);
-	// Check for valid JSON
-	if(is_object($json_response) && $json_response->{'userid'}) {
-		return "Registration Complete";			
+	if($json_response->{'userid'}) {
+		return "Registration Complete";
 	} else {
-		$response_xml = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response);
-		$response_xml = simplexml_load_string($response_xml);	
-		$response = trim(htmlentities($response_xml->error));
-		$full_length = strlen($response);	
-		#Remove HTML tag with content from the message, return from forum if email of user already exist.
-		if(strpos($response,'&lt;')) {
-			$bad_string = strpos($response,'&lt;');
-			$response = substr($response, 0, $bad_string-1);
-		}
-		# returning sso register response
-		return $response;		  
+		// return error message.
+		return $json_response->{'message'};
 	}
-	
 }
 
 
@@ -70,25 +59,16 @@ function forumSignin($user) {
 	$response = doHTTPCall($URL);
 	// decode json data
 	$json_response = json_decode($response);
-	// Check for valid JSON data
-	if(is_object($json_response)) {					
-		$authtoken = $json_response->{'authtoken'};	
-		$error_message = $json_response->{'message'};
-	} else {			
-		$response = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response);
-		$response = simplexml_load_string($response);	
-		$authtoken = htmlentities($response->authtoken);	
-		$error_message = $response->errormessage;
-	}		
 	# Check authtoken for null. If authtoken not null then load with "register/dologin?authtoken" url through IMG src to sign in on websitetoolbox forum.
-	if ($authtoken) {
-		$_SESSION['authtoken'] = $authtoken;
-		echo "<img src='//".HOST."/register/dologin?authtoken=$authtoken' border='0' width='1' height='1' alt=''>";
+	if ($json_response->{'authtoken'}) {
+		$_SESSION['authtoken'] = $json_response->{'authtoken'};
+		echo "<img src='//".HOST."/register/dologin?authtoken=".$json_response->{'authtoken'}."' border='0' width='1' height='1' alt=''>";
 		# You can optionally redirect or link to http://".HOST."/?authtoken=$authtoken instead of using the IMG tag, 
 		# or you can use both because the IMG tag will fail in browsers that block third-party cookies.
 		return "Login Successful";	
 	} else {
-		return $error_message;
+		// return error message.
+		return $json_response->{'message'};
 	}
 }
 #Purpose: function for sign out from websitetoolbox forum.
@@ -111,21 +91,12 @@ function forumSignout() {
 		$response = doHTTPCall($URL);
 		// decode json data
 		$json_response = json_decode($response);
-		// Check for valid JSON data
-		if(is_object($json_response)) {
-			$authtoken = $json_response->{'authtoken'};	
-			$errormessage = $json_response->{'message'};
-		} else {
-			$response = preg_replace_callback('/<!\[CDATA\[(.*)\]\]>/', 'filter_xml', $response);
-			$response = simplexml_load_string($response);	
-			$authtoken = htmlentities($response->authtoken);
-			$errormessage = htmlentities($response->errormessage);
-		}
-		if($authtoken) {
-			echo "<img src='//".HOST."/register/logout?authtoken=".$authtoken."' border='0' width='1' height='1' alt=''>";
+		if($json_response->{'authtoken'}) {
+			echo "<img src='//".HOST."/register/logout?authtoken=".$json_response->{'authtoken'}."' border='0' width='1' height='1' alt=''>";
 			return "Logout Successful";
 		} else {
-			return $errormessage;
+			// return error message.
+			return $json_response->{'message'};
 		}		
 	}	
 }
