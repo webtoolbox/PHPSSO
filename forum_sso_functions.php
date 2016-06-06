@@ -56,10 +56,13 @@ function forumSignin($user) {
 	# making a request using curl or file and getting response from the Website Toolbox.
 	$response = doHTTPCall($URL);
 	$json_response = json_decode($response);
+	# split token on the basis of '-' if exist
+	$acc_token = explode('-',$json_response->{'authtoken'});
+	$authtoken = $acc_token[0];
 	# Check authtoken for null. If authtoken not null then load with "register/dologin?authtoken" url through IMG src to sign in on websitetoolbox forum.
-	if ($json_response->{'authtoken'}) {
-		$_SESSION['authtoken'] = $json_response->{'authtoken'};
-		echo "<img src='//".HOST."/register/dologin?authtoken=".$json_response->{'authtoken'}."' border='0' width='1' height='1' alt=''>";
+	if ($authtoken) {
+		$_SESSION['authtoken'] = $authtoken;
+		echo "<img src='//".HOST."/register/dologin?authtoken=".$authtoken."' border='0' width='1' height='1' alt=''>";
 		# You can optionally redirect or link to http://".HOST."/?authtoken=$authtoken instead of using the IMG tag, 
 		# or you can use both because the IMG tag will fail in browsers that block third-party cookies.
 		return "Login Successful";	
