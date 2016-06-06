@@ -56,7 +56,7 @@ function forumSignin($user) {
 	# making a request using curl or file and getting response from the Website Toolbox.
 	$response = doHTTPCall($URL);
 	$json_response = json_decode($response);
-	# split token on the basis of '-' if exist
+	# split token on the basis of '-'
 	$acc_token = explode('-',$json_response->{'authtoken'});
 	$authtoken = $acc_token[0];
 	# Check authtoken for null. If authtoken not null then load with "register/dologin?authtoken" url through IMG src to sign in on websitetoolbox forum.
