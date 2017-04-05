@@ -13,7 +13,7 @@ if (!$_SESSION) {session_start();}
 #Purpose: Function for registering a new user on websitetoolbox forum. 
 #parmeter: Param $user an array containing information about the new user. The array user will contain mandatory values (member, pw and email) which will be used to build URL query string to register a new user on websitetoolbox forum. The array $user can also contain optional value such as name, avatar, profile picture etc.
 # URL with all parameter from $user array passed in doHTTPCall function to create a request using curl or file and getting response from the Website Toolbox forum.
-#return: Parse and return user registration xml response "Registration Complete" or error response  from websitetoolbox forum.
+#return: "Registration Complete" or error response string from Website Toolbox.
 function forumSignup($user) {
 	# Changes the case of all keys in an array
 	$user = array_change_key_case($user);	
@@ -40,7 +40,7 @@ function forumSignup($user) {
 # URL with user and apikey parameter passed in doHTTPCall function to create a request using curl or file and return authtoken from the Website Toolbox forum.
 # Assigned authtoken into $_SESSION['authtoken'].  
 # The returned authtoken is checked for null. If it's not null then loaded with "register/dologin?authtoken" url through IMG src to sign in on websitetoolbox forum.
-# return: Returns user's sign in status as "Login Successful" or "$response_xml->errormessage" from websitetoolbox forum.
+# return: "Login Successful" or an error response string from Website Toolbox.
 function forumSignin($user) {
 	# Changes the case of all keys in an array
 	$user = array_change_key_case($user);	
@@ -110,8 +110,4 @@ function doHTTPCall($URL){
 	return $response;
 }
 
-#Purpose: Function for filtering response xml
-function filter_xml($matches) {
-	return trim(htmlspecialchars($matches[1]));
-} 
 ?>
