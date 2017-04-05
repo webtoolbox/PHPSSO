@@ -59,6 +59,8 @@ function forumSignin($user) {
 
 	# Check authtoken for null. If authtoken not null then load with "register/dologin?authtoken" url through IMG src to sign in on websitetoolbox forum.
 	if ($json_response->{'authtoken'}) {
+		# potentially also store $json_response->{'userid'} in your database for later use
+		
 		$_SESSION['authtoken'] = $json_response->{'authtoken'};
 		echo "<img src='//".HOST."/register/dologin?authtoken=".$json_response->{'authtoken'}."' border='0' width='1' height='1' alt=''>";
 		# You can optionally redirect or link to http://".HOST."/?authtoken=$json_response->{'authtoken'} instead of using the IMG tag, 
