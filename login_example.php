@@ -21,6 +21,8 @@ $user['email'] = 'john@gmail.com';
 // SSO login would work smoothly even without the user's account having a password.
 $user['pw'] = 'john123';
 
+// The user's name. In case the account doesn't already exist and needs to be created.
+$user['name'] = 'John Smith';
 
 // function called for sign in on the websitetoolbox forum if username exist on user's site as well as on Website Toolbox forum.
 // The function will print an IMG tag to get login on websitetoolbox forum.
