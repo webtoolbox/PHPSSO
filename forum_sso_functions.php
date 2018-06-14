@@ -61,10 +61,13 @@ function forumSignin($user) {
 	if ($json_response->{'authtoken'}) {
 		# potentially also store $json_response->{'userid'} in your database for later use
 		
+		# Include &remember=1 at the end of the URL below to make the log in perisistent between browser sessions.
+		
 		$_SESSION['authtoken'] = $json_response->{'authtoken'};
 		echo "<img src='//".HOST."/register/dologin?authtoken=".$json_response->{'authtoken'}."' border='0' width='1' height='1' alt=''>";
 		# You can optionally redirect or link to http://".HOST."/?authtoken=$json_response->{'authtoken'} instead of using the IMG tag, 
 		# or you can use both because the IMG tag will fail in browsers that block third-party cookies if a subdomain isn't being used.
+		# Include &remember=1 at the end of the URL to make the log in perisistent between browser sessions.
 		return "Login Successful";	
 	} else {
 		return $json_response->{'message'};
