@@ -1,6 +1,3 @@
-PHP library for Single Sign On with a Website Toolbox Forum
-======
-
 Integrate Single Sign On in PHP with a [`Website Toolbox Forum`](http://www.websitetoolbox.com/).
 
 Instructions:
