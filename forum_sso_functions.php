@@ -1,118 +1,186 @@
 <?php
-# This file contains functions for the websitetoolbox.com forum single sign on.
+# This file contains functions used to set up Single Sign On between your Website Toolbox forum and your website
+# See: https://www.websitetoolbox.com/support/single-sign-on-token-based-authentication-241
 
-# Replace USERNAME with your Website Toolbox username. If you are using a managed domain or a subdomain, use that instead of USERNAME.websitetoolbox.com. 
-define("HOST","USERNAME.websitetoolbox.com");
+# ie: https://USERNAME.discussion.community, https://forums.mysite.com, etc.
+# This should not be an embed page URL.
+define("FORUM_DOMAIN","");
+
 # Get The API Key from the Settings -> Single Sign On section of the Website Toolbox admin area.
-define("API_KEY","rzbHTaTbCeO");
+define("FORUM_API_KEY","");
 
-# Initializing session if it is not started in client project files to assign SSO login authtoken into $_SESSION['authtoken']. The $_SESSION['authtoken'] is used in forumSignout function to logout from websitetoolbox forum.
-# Checking current session status if it is not exists in client project files then session will be started.
-if (!$_SESSION) {session_start();}
+# Only if you're using the forum embed code. ie: https://mysite.com/forum/
+define("FORUM_EMBED_PAGE","");
 
-#Purpose: Function for registering a new user on websitetoolbox forum. 
-#parmeter: Param $user an array containing information about the new user. The array user will contain mandatory values (member, pw and email) which will be used to build URL query string to register a new user on websitetoolbox forum. The array $user can also contain optional value such as name, avatar, profile picture etc.
-# URL with all parameter from $user array passed in doHTTPCall function to create a request using curl or file and getting response from the Website Toolbox forum.
-#return: "Registration Complete" or error response string from Website Toolbox.
-function forumSignup($user) {
-	# Changes the case of all keys in an array
-	$user = array_change_key_case($user);	
-	foreach ($user as $key => $value) {
-	  if ($value === NULL)
-		 $user[$key] = '';
-	}
-	# Generating a URL-encoded query string from the $user array.	
-	$parameters = http_build_query($user, NULL, '&');   
-	$URL = "/register/create_account?type=json&apikey=".API_KEY."&".$parameters;
-	# making a request using curl or file and getting response from the Website Toolbox.
-	$response = doHTTPCall($URL);
-	$json_response = json_decode($response);
-	if($json_response->{'userid'}) {
-		return "Registration Complete";
-	} else {
-		return $json_response->{'message'};
+# Remember the user even after they close their browser?
+define("PERSISTENT_FORUM_SESSION","1");
+
+// ------------------------------------------------------------------ //
+
+function createForumUser ($user) {
+	$response = forumHTTPRequest("/register/create_account", $user);
+	if(!$response->{'userid'}) {
+		error_log("Failed to create forum account: ". $response->{'message'});
 	}
 }
 
-
-# Purpose: function for sign in on websitetoolbox forum if username exist on your website as well as on Website Toolbox forum.
-# parmeter: Param $user an array containing information about the currently signed on user. The array user will contain mandatory (user) value which passed with apikey in request URL.
-# URL with user and apikey parameter passed in doHTTPCall function to create a request using curl or file and return authtoken from the Website Toolbox forum.
-# Assigned authtoken into $_SESSION['authtoken'].  
-# The returned authtoken is checked for null. If it's not null then loaded with "register/dologin?authtoken" url through IMG src to sign in on websitetoolbox forum.
-# return: "Login Successful" or an error response string from Website Toolbox.
-function forumSignin($user) {
-	# Changes the case of all keys in an array
-	$user = array_change_key_case($user);	
-	foreach ($user as $key => $value) {
-	  if ($value === NULL)
-		 $user[$key] = '';
-	}
-	# Generating a URL-encoded query string from the $user array.	
-	$login_parameters = http_build_query($user, NULL, '&');
-	# user details stored in session which will used later in forumSignout function. 
-	$_SESSION['login_parameters'] = $login_parameters;
-	$URL = "/register/setauthtoken?type=json&apikey=".API_KEY."&".$login_parameters;
-	# making a request using curl or file and getting response from the Website Toolbox.
-	$response = doHTTPCall($URL);
-	$json_response = json_decode($response);
-
-	# Check authtoken for null. If authtoken not null then load with "register/dologin?authtoken" url through IMG src to sign in on websitetoolbox forum.
-	if ($json_response->{'authtoken'}) {
-		# potentially also store $json_response->{'userid'} in your database for later use
-		
-		# Include &remember=1 at the end of the URL below to make the log in perisistent between browser sessions.
-		
-		$_SESSION['authtoken'] = $json_response->{'authtoken'};
-		echo "<img src='//".HOST."/register/dologin?authtoken=".$json_response->{'authtoken'}."' border='0' width='1' height='1' alt=''>";
-		# You can optionally redirect or link to http://".HOST."/?authtoken=$json_response->{'authtoken'} instead of using the IMG tag, 
-		# or you can use both because the IMG tag will fail in browsers that block third-party cookies if a subdomain isn't being used.
-		# Include &remember=1 at the end of the URL to make the log in perisistent between browser sessions.
-		return "Login Successful";	
+function storeForumAuthToken ($user) {
+	$response = forumHTTPRequest("/register/setauthtoken", $user);
+	if ($response->{'authtoken'}) {
+		# potentially also store $response->{'userid'} in your database for later use (ie: using the API to delete a user or update their email address)
+		if (!$_SESSION) {
+			session_start();
+		}
+		$_SESSION['authtoken'] = $response->{'authtoken'};
 	} else {
-		return $json_response->{'message'};
+		error_log("Failed to get forum authtoken: ". $response->{'message'});
 	}
 }
-#Purpose: function for sign out from websitetoolbox forum.
-# It check for $_SESSION['authtoken'] if it's not null then the "register/logout?authtoken" is loaded with IMG src to logout user from websitetoolbox forum.
-# Reset authtoken session variable $_SESSION['authtoken'] after successful sign out.
-# return: the function will return sign out status message as "Logout Successful" or "Logout Failed" from websitetoolbox forum.
-function forumSignout() {
-	# Check for authtoken value. If authtoken not null then load /register/logout?authtoken url through IMG src to sign out from websitetoolbox forum.
-	if($_SESSION['authtoken']) {
-		echo "<img src='//".HOST."/register/logout?authtoken=".$_SESSION['authtoken']."' border='0' width='1' height='1' alt=''>";
-		# Reset authtoken session variable after sign out.
+
+function printLoginImage () {
+	if(isset($_SESSION['authtoken'])) {
+		$url = getForumDomain()."/register/dologin?authtoken=".$response->{'authtoken'};
+		if (PERSISTENT_FORUM_SESSION) {
+			$url .= "&remember=1";
+		}
+		echo "<img src='$url' border='0' width='1' height='1' alt=''>";
+	}
+}
+
+function printLogoutImage () {
+	if(isset($_SESSION['authtoken'])) {
+		echo "<img src='".getForumDomain()."/register/logout?authtoken=".$_SESSION['authtoken']."' border='0' width='1' height='1' alt=''>";
 		$_SESSION['authtoken'] = '';
-		return "Logout Successful";	
-	} else {
-		# If authtoken is missing from session variable then making a HTTP request using curl and getting authtoken from the Website Toolbox. 
-		# Passing user details via $_SESSION['login_parameters'] which stored in session during user login.
-		# If authtoken not null then the "register/logout?authtoken" is loaded with IMG src to logout user from websitetoolbox forum and return sign out status message as "Logout Successful"
-		# If authtoken returned as null then appropriate error message will be returned. 
-		$URL = "/register/getauthtoken?type=json&apikey=".API_KEY."&".$_SESSION['login_parameters'];
-		$response = doHTTPCall($URL);
-		$json_response = json_decode($response);
-		if($json_response->{'authtoken'}) {
-			echo "<img src='//".HOST."/register/logout?authtoken=".$json_response->{'authtoken'}."' border='0' width='1' height='1' alt=''>";
-			return "Logout Successful";
-		} else {
-			return $json_response->{'message'};
-		}		
-	}	
+	}
 }
 
-#Purpose: Create a request using curl and getting response from the Website Toolbox.
-#parmeter: request URL which will use to make curl request to websitetoolbox forum.
-#return: return response from the Website Toolbox forum.
-function doHTTPCall($URL){
-	/* Sent HTTP request on the website Toolbox from from your sever. */
-	$ch = curl_init("http://".HOST.$URL);
-	curl_setopt($ch, CURLOPT_HEADER, 0);
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	$response = curl_exec($ch);      
-	curl_close($ch);
+function getForumDomain () {
+	$forumDomain = FORUM_DOMAIN;
+	if (!preg_match("#^https?://#i", $forumDomain)) {
+		$forumDomain = "http://".$forumDomain;
+	}
+	if (preg_match("#^https?://.+/.+#i", $forumDomain)) {
+		error_log("Invalid forum address provided in SSO code.");
+	}
+	return $forumDomain;
+}
+
+function getForumEmbedPage () {
+	$forumEmbedPage = FORUM_EMBED_PAGE;
+	if ($forumEmbedPage) {
+		if (!preg_match("#^https?://#i", $forumEmbedPage)) {
+			$forumEmbedPage = "http://".$forumEmbedPage;
+		}
+	}
+	return $forumEmbedPage;
+}
+
+function getForumAddress () {
+	if (FORUM_EMBED_PAGE) {
+		$forumAddress = getForumEmbedPage();
+	} else {
+		$forumAddress = getForumDomain();
+	}
+	if (isset($_SESSION['authtoken'])) {
+		if (preg_match("#\?#", $forumAddress)) {
+			$forumAddress .= "&";
+		} else {
+			$forumAddress .= "?";
+		}
+		$forumAddress .= "authtoken=".$_SESSION['authtoken'];
+		if (PERSISTENT_FORUM_SESSION) {
+			$forumAddress .= "remember=1";
+		}
+	}
+	return $forumAddress;
+}
+
+function forumHTTPRequest($path, $user){
+	if (preg_match("#\?#", $path)) {
+		$path .= "&";
+	} else {
+		$path .= "?";
+	}
+
+	# Generating a URL-encoded query string from the $user array.
+	$parameters = '';
+	if ($user) {
+		$user = array_change_key_case($user);
+		foreach ($user as $key => $value) {
+			if ($value === NULL)
+			 $user[$key] = '';
+		}
+		$parameters = http_build_query($user, NULL, '&');
+	}
+
+	$url = getForumDomain().$path."type=json&apikey=".FORUM_API_KEY."&".$parameters;
+	$curl = curl_init($url);
+	curl_setopt($curl, CURLOPT_HEADER, 0);
+	curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+	$response = curl_exec($curl);
+	curl_close($curl);
+	$namedArray = json_decode($response);
+	return $namedArray;
+}
+
+// API functions: https://www.websitetoolbox.com/api/
+
+function getForumUser ($userId) {
+	$user = forumApiGetRequest("/users/$userId");
+	return $user;
+}
+
+function updateForumUser ($userId, $data) {
+	$user = forumApiPostRequest("/users/$userId", $data);
+	return $user;
+}
+
+function deleteForumUser ($userId) {
+	$response = forumApiDeleteRequest("/users/$userId");
 	return $response;
+}
+
+function forumApiGetRequest ($path){
+	$url = "https://api.websitetoolbox.com/v1/api$path";
+	$curl = curl_init($url);
+	curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+	      "x-api-key: ".FORUM_API_KEY
+	   ));
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+	$response = curl_exec($curl);
+	curl_close($curl);
+	$namedArray = json_decode($response);
+	return $namedArray;
+}
+
+function forumApiPostRequest ($path, $data){
+	$url = "https://api.websitetoolbox.com/v1/api$path";
+	$curl = curl_init($url);
+	curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+	      "x-api-key: ".FORUM_API_KEY
+	   ));
+	curl_setopt($curl, CURLOPT_POST, true);
+	curl_setopt($curl,CURLOPT_POSTFIELDS, json_encode($data));
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+	$response = curl_exec($curl);
+	curl_close($curl);
+	$namedArray = json_decode($response);
+	return $namedArray;
+}
+
+function forumApiDeleteRequest ($path){
+	$url = "https://api.websitetoolbox.com/v1/api$path";
+	$curl = curl_init($url);
+	curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+	      "x-api-key: ".FORUM_API_KEY
+	   ));
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+	$response = curl_exec($curl);
+	curl_close($curl);
+	$namedArray = json_decode($response);
+	return $namedArray;
 }
 
 ?>

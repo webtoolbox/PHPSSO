@@ -1,18 +1,20 @@
-PHPSSO
+PHP library for Single Sign On with a Website Toolbox Forum
 ======
 
-Contains client files for integrating Single Sign On and Single Registration in PHP with a [`Website Toolbox Forum`](http://www.websitetoolbox.com/forum-hosting/index.html).
+Integrate Single Sign On in PHP with a [`Website Toolbox Forum`](http://www.websitetoolbox.com/).
 
-The following files are included in this repo.
+Instructions:
 
-* [`forum_sso_functions.php`](https://github.com/webtoolbox/PHPSSO/blob/master/forum_sso_functions.php)
-  This is the main file you need. You don't need any other file in your project. You just need to give your forum address and forum API Key at the top of the script. Then you can drop this file anywhere that you can access it on your site. 
-* [`registration_example.php`](https://github.com/webtoolbox/PHPSSO/blob/master/registration_example.php)
-  This file offers an example usage for single registration. You can customize this page or start from scratch.
-* [`login_example.php`](https://github.com/webtoolbox/PHPSSO/blob/master/login_example.php)
-  This file offers an example usage for SSO login. You can customize this page or start from scratch.
-* [`logout_example.php`](https://github.com/webtoolbox/PHPSSO/blob/master/logout_example.php)
-  This file offers an example usage for SSO logout. You can customize this page or start from scratch.
+1. Provide values for the variables at the top of [`forum_sso_functions.php`](https://github.com/webtoolbox/PHPSSO/blob/master/forum_sso_functions.php)
+
+2. Include [`forum_sso_functions.php`](https://github.com/webtoolbox/PHPSSO/blob/master/forum_sso_functions.php) in your website's PHP files wherever you need to integrate Single Sign On.
+
+3. Copy code from the [`examples`](https://github.com/webtoolbox/PHPSSO/blob/master/examples) into your own website's files.
+
+4. Specify your sign up, log in, and log out page URLs in the [`Single Sign On settings`](https://www.websitetoolbox.com/tool/members/mb/settings?tab=Single%20Sign%20On&highlight=website_builder).
+
+[`Contact us`](https://www.websitetoolbox.com/contact?subject=SSO+integration+help) if you need help. Go to the [`Single Sign On settings`](https://www.websitetoolbox.com/tool/members/mb/settings?tab=Single%20Sign%20On&highlight=website_builder) and select your website builder to have our development team integrate SSO for you, starting at just $199.
+
+You can read our [`SSO documentation`](https://www.websitetoolbox.com/support/single-sign-on-token-based-authentication-241) to understand how the approach works.
 
 This example uses [`cURL`](http://php.net/manual/en/book.curl.php) to make HTTP requests. Most servers have cURL pre-installed. If you don't have the cURL php extension installed on your server, you can [`install it`](http://php.net/manual/en/curl.installation.php) or use a different method to make HTTP requests.  
- 
