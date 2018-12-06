@@ -1,4 +1,4 @@
-Use PHP to integrate Single Sign On with your [`Website Toolbox Forum`](http://www.websitetoolbox.com/).
+Use PHP to integrate Single Sign On between your website and your [`Website Toolbox Forum`](http://www.websitetoolbox.com/). Code and examples are included for integrating log in, log out, sign up, deleting, and updating the account.
 
 Instructions:
 
