@@ -5,22 +5,23 @@ if (isset($_GET['action']) && $_GET['action'] == 'update') {
 
   // Your code to update the user's account on your website goes here
 
-  $userId = '';
-  $user = array();
-  $user['username'] = $_POST['username'];
-  $user['password'] = $_POST['password'];
-  $user['email'] = $_POST['email'];
-  $user['name'] = $_POST['name'];
-  $user['avatarUrl'] = "";
-  $user['userGroups'] = [];
-  $user['customFields'] = [
-    {
-      "profileFieldId": 42323,
-      "value": "string"
-    }
-  ];
+  if (isset($_SESSION['forum_userid'])) {
+    $user = array();
+    $user['username'] = $_POST['username'];
+    $user['password'] = $_POST['password'];
+    $user['email'] = $_POST['email'];
+    $user['name'] = $_POST['name'];
+    $user['avatarUrl'] = "";
+    $user['userGroups'] = [];
+    $user['customFields'] = [
+      [
+        "profileFieldId" => 42323,
+        "value" => "string"
+      ]
+    ];
 
-  updateForumUser($userId, $user);
+    updateForumUser($_SESSION['forum_userid'], $user);
+  }
 
   header("Location: index.php");
   exit();

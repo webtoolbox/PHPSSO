@@ -17,6 +17,10 @@ define("PERSISTENT_FORUM_SESSION","1");
 
 // ------------------------------------------------------------------ //
 
+if (!$_SESSION) {
+	session_start();
+}
+
 function createForumUser ($user) {
 	$response = forumHTTPRequest("/register/create_account", $user);
 	if(!$response->{'userid'}) {
@@ -27,10 +31,7 @@ function createForumUser ($user) {
 function storeForumAuthToken ($user) {
 	$response = forumHTTPRequest("/register/setauthtoken", $user);
 	if ($response->{'authtoken'}) {
-		# potentially also store $response->{'userid'} in your database for later use (ie: using the API to delete a user or update their email address)
-		if (!$_SESSION) {
-			session_start();
-		}
+		$_SESSION['forum_userid'] = $response->{'userid'};
 		$_SESSION['authtoken'] = $response->{'authtoken'};
 	} else {
 		error_log("Failed to get forum authtoken: ". $response->{'message'});
@@ -39,7 +40,7 @@ function storeForumAuthToken ($user) {
 
 function printLoginImage () {
 	if(isset($_SESSION['authtoken'])) {
-		$url = getForumDomain()."/register/dologin?authtoken=".$response->{'authtoken'};
+		$url = getForumDomain()."/register/dologin?authtoken=".$_SESSION['authtoken'];
 		if (PERSISTENT_FORUM_SESSION) {
 			$url .= "&remember=1";
 		}
@@ -50,7 +51,7 @@ function printLoginImage () {
 function printLogoutImage () {
 	if(isset($_SESSION['authtoken'])) {
 		echo "<img src='".getForumDomain()."/register/logout?authtoken=".$_SESSION['authtoken']."' border='0' width='1' height='1' alt=''>";
-		$_SESSION['authtoken'] = '';
+		unset($_SESSION['authtoken']);
 	}
 }
 

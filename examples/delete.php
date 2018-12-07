@@ -3,8 +3,9 @@
 
 	// Your code to delete the user from your website goes here
 
-  $userId = '';
-  deleteForumUser($userId);
+	if (isset($_SESSION['forum_userid'])) {
+		deleteForumUser($_SESSION['forum_userid']);
+	}
 
 	header("Location: index.php");
 	exit();
