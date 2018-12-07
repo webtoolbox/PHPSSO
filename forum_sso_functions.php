@@ -140,6 +140,10 @@ function updateForumUser ($userId, $data) {
 
 function deleteForumUser ($userId) {
 	$response = forumApiDeleteRequest("/users/$userId");
+	if (isset($_SESSION['forum_userid']) && $userId == $_SESSION['forum_userid']) {
+		unset($_SESSION['authtoken']);
+		unset($_SESSION['forum_userid']);
+	}
 	return $response;
 }
 
