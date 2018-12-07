@@ -52,6 +52,7 @@ function printLogoutImage () {
 	if(isset($_SESSION['authtoken'])) {
 		echo "<img src='".getForumDomain()."/register/logout?authtoken=".$_SESSION['authtoken']."' border='0' width='1' height='1' alt=''>";
 		unset($_SESSION['authtoken']);
+		unset($_SESSION['forum_userid']);
 	}
 }
 
