@@ -3,9 +3,12 @@
 
 	// Your code to log the user out of your website goes here
 
-	$authtoken = $_COOKIE['authtoken'];
-	\WTForum\logout();
+	$parameters = '';
+	if (isset($_COOKIE['authtoken'])) {
+		$parameters = "&authtoken=".$_COOKIE['authtoken'];
+		\WTForum\logout();
+	}
 
-	header("Location: index.php?action=logout&authtoken=$authtoken");
+	header("Location: index.php?action=logout".$parameters);
 	exit();
 ?>
