@@ -16,8 +16,8 @@ if (isset($_GET['action']) && $_GET['action'] == 'signup') {
   $user['usergroupid'] = ""; // optional
   $user['field42323'] = ""; // example custom profile field. optional
 
-  createForumUser($user);
-  storeForumAuthToken($user);
+  \WTForum\createUser($user);
+  \WTForum\storeAuthToken($user);
   header("Location: index.php?action=login");
   exit();
 }
@@ -32,7 +32,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'signup') {
   <p>Navigation:</p>
   <ul>
     <li><a href="index.php">Home</a></li>
-    <li><a href="<?php echo getForumAddress(); ?>">Forum</a></li>
+    <li><a href="<?php echo \WTForum\getAddress(); ?>">Forum</a></li>
     <li><a href="signup.php">Sign up</a></li>
     <li><a href="login.php">Log in</a></li>
     <li><a href="logout.php">Log out</a></li>

@@ -3,8 +3,8 @@
 
 	// Your code to delete the user from your website goes here
 
-	if (isset($_SESSION['forum_userid'])) {
-		deleteForumUser($_SESSION['forum_userid']);
+	if (isset($_COOKIE['forum_userid'])) {
+		\WTForum\deleteUser($_COOKIE['forum_userid']);
 	}
 
 	header("Location: index.php");

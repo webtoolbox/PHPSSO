@@ -3,6 +3,8 @@
 
 	// Your code to log the user out of your website goes here
 
+	\WTForum\logout();
+
 	header("Location: index.php?action=logout");
 	exit();
 ?>

@@ -9,7 +9,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {
   // If you want to auto-create the user when they don't already exist, include 'email' (ie: $user['email']).
   // Optionally also include pw, name, usergroupid, and custom profile fields.
 
-  storeForumAuthToken($user);
+  \WTForum\storeAuthToken($user);
   header("Location: index.php?action=login");
   exit();
 }
@@ -24,7 +24,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {
   <p>Navigation:</p>
   <ul>
     <li><a href="index.php">Home</a></li>
-    <li><a href="<?php echo getForumAddress(); ?>">Forum</a></li>
+    <li><a href="<?php echo \WTForum\getAddress(); ?>">Forum</a></li>
     <li><a href="signup.php">Sign up</a></li>
     <li><a href="login.php">Log in</a></li>
     <li><a href="logout.php">Log out</a></li>

@@ -5,7 +5,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'update') {
 
   // Your code to update the user's account on your website goes here
 
-  if (isset($_SESSION['forum_userid'])) {
+  if (isset($_COOKIE['forum_userid'])) {
     $user = array();
     $user['username'] = $_POST['username'];
     $user['password'] = $_POST['password'];
@@ -20,7 +20,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'update') {
       ]
     ];
 
-    updateForumUser($_SESSION['forum_userid'], $user);
+    \WTForum\updateUser($_COOKIE['forum_userid'], $user);
   }
 
   header("Location: index.php");
@@ -37,7 +37,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'update') {
   <p>Navigation:</p>
   <ul>
     <li><a href="index.php">Home</a></li>
-    <li><a href="<?php echo getForumAddress(); ?>">Forum</a></li>
+    <li><a href="<?php echo \WTForum\getAddress(); ?>">Forum</a></li>
     <li><a href="signup.php">Sign up</a></li>
     <li><a href="login.php">Log in</a></li>
     <li><a href="logout.php">Log out</a></li>

@@ -2,45 +2,51 @@
 # This file contains functions used to set up Single Sign On between your Website Toolbox forum and your website
 # See: https://www.websitetoolbox.com/support/single-sign-on-token-based-authentication-241
 
+namespace WTForum;
+
 # ie: https://USERNAME.discussion.community, https://forums.mysite.com, etc.
 # This should not be an embed page URL.
-define("FORUM_DOMAIN","");
+define("WTForum\FORUM_DOMAIN","");
 
 # Get The API Key from the Settings -> Single Sign On section of the Website Toolbox admin area.
-define("FORUM_API_KEY","");
+define("WTForum\FORUM_API_KEY","");
 
 # Only if you're using the forum embed code. ie: https://mysite.com/forum/
-define("FORUM_EMBED_PAGE","");
+define("WTForum\FORUM_EMBED_PAGE","");
 
 # Remember the user even after they close their browser?
-define("PERSISTENT_FORUM_SESSION","1");
+define("WTForum\PERSISTENT_FORUM_SESSION","1");
 
 // ------------------------------------------------------------------ //
 
-if (!$_SESSION) {
-	session_start();
-}
-
-function createForumUser ($user) {
-	$response = forumHTTPRequest("/register/create_account", $user);
+function createUser ($user) {
+	$response = httpRequest("/register/create_account", $user);
 	if(!$response->{'userid'}) {
 		error_log("Failed to create forum account: ". $response->{'message'});
 	}
 }
 
-function storeForumAuthToken ($user) {
-	$response = forumHTTPRequest("/register/setauthtoken", $user);
+function storeAuthToken ($user) {
+	$response = httpRequest("/register/setauthtoken", $user);
 	if ($response->{'authtoken'}) {
-		$_SESSION['forum_userid'] = $response->{'userid'};
-		$_SESSION['authtoken'] = $response->{'authtoken'};
+		setForumCookie('forum_userid', $response->{'userid'});
+		setForumCookie('authtoken', $response->{'authtoken'});
 	} else {
 		error_log("Failed to get forum authtoken: ". $response->{'message'});
 	}
 }
 
+function logout () {
+	// calling printLogoutImage() in your code is also required
+	if(isset($_COOKIE['authtoken'])) {
+		setForumCookie('authtoken', '');
+		setForumCookie('forum_userid', '');
+	}
+}
+
 function printLoginImage () {
-	if(isset($_SESSION['authtoken'])) {
-		$url = getForumDomain()."/register/dologin?authtoken=".$_SESSION['authtoken'];
+	if(isset($_COOKIE['authtoken'])) {
+		$url = getDomain()."/register/dologin?authtoken=".$_COOKIE['authtoken'];
 		if (PERSISTENT_FORUM_SESSION) {
 			$url .= "&remember=1";
 		}
@@ -49,14 +55,12 @@ function printLoginImage () {
 }
 
 function printLogoutImage () {
-	if(isset($_SESSION['authtoken'])) {
-		echo "<img src='".getForumDomain()."/register/logout?authtoken=".$_SESSION['authtoken']."' border='0' width='1' height='1' alt=''>";
-		unset($_SESSION['authtoken']);
-		unset($_SESSION['forum_userid']);
+	if(isset($_COOKIE['authtoken'])) {
+		echo "<img src='".getDomain()."/register/logout?authtoken=".$_COOKIE['authtoken']."' border='0' width='1' height='1' alt=''>";
 	}
 }
 
-function getForumDomain () {
+function getDomain () {
 	$forumDomain = FORUM_DOMAIN;
 	if (!preg_match("#^https?://#i", $forumDomain)) {
 		$forumDomain = "http://".$forumDomain;
@@ -67,7 +71,7 @@ function getForumDomain () {
 	return $forumDomain;
 }
 
-function getForumEmbedPage () {
+function getEmbedPage () {
 	$forumEmbedPage = FORUM_EMBED_PAGE;
 	if ($forumEmbedPage) {
 		if (!preg_match("#^https?://#i", $forumEmbedPage)) {
@@ -77,19 +81,19 @@ function getForumEmbedPage () {
 	return $forumEmbedPage;
 }
 
-function getForumAddress () {
+function getAddress () {
 	if (FORUM_EMBED_PAGE) {
-		$forumAddress = getForumEmbedPage();
+		$forumAddress = getEmbedPage();
 	} else {
-		$forumAddress = getForumDomain();
+		$forumAddress = getDomain();
 	}
-	if (isset($_SESSION['authtoken'])) {
+	if (isset($_COOKIE['authtoken'])) {
 		if (preg_match("#\?#", $forumAddress)) {
 			$forumAddress .= "&";
 		} else {
 			$forumAddress .= "?";
 		}
-		$forumAddress .= "authtoken=".$_SESSION['authtoken'];
+		$forumAddress .= "authtoken=".$_COOKIE['authtoken'];
 		if (PERSISTENT_FORUM_SESSION) {
 			$forumAddress .= "remember=1";
 		}
@@ -97,7 +101,7 @@ function getForumAddress () {
 	return $forumAddress;
 }
 
-function forumHTTPRequest($path, $user){
+function httpRequest($path, $user){
 	if (preg_match("#\?#", $path)) {
 		$path .= "&";
 	} else {
@@ -115,7 +119,7 @@ function forumHTTPRequest($path, $user){
 		$parameters = http_build_query($user, NULL, '&');
 	}
 
-	$url = getForumDomain().$path."type=json&apikey=".FORUM_API_KEY."&".$parameters;
+	$url = getDomain().$path."type=json&apikey=".FORUM_API_KEY."&".$parameters;
 	$curl = curl_init($url);
 	curl_setopt($curl, CURLOPT_HEADER, 0);
 	curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
@@ -126,63 +130,49 @@ function forumHTTPRequest($path, $user){
 	return $namedArray;
 }
 
+function setForumCookie ($name, $value) {
+	if (PERSISTENT_FORUM_SESSION) {
+		$expiration = time()+60*60*24*365*5;
+	} else {
+		$expiration = 0;
+	}
+	setcookie($name, $value, $expiration, "/");
+}
+
 // API functions: https://www.websitetoolbox.com/api/
 
-function getForumUser ($userId) {
-	$user = forumApiGetRequest("/users/$userId");
+function getUser ($userId) {
+	$user = apiRequest('GET', "/users/$userId");
 	return $user;
 }
 
-function updateForumUser ($userId, $data) {
-	$user = forumApiPostRequest("/users/$userId", $data);
+function updateUser ($userId, $data) {
+	$user = apiRequest('POST', "/users/$userId", $data);
 	return $user;
 }
 
-function deleteForumUser ($userId) {
-	$response = forumApiDeleteRequest("/users/$userId");
-	if (isset($_SESSION['forum_userid']) && $userId == $_SESSION['forum_userid']) {
-		unset($_SESSION['authtoken']);
-		unset($_SESSION['forum_userid']);
+function deleteUser ($userId) {
+	$response = apiRequest('DELETE', "/users/$userId");
+	if (isset($_COOKIE['forum_userid']) && $userId == $_COOKIE['forum_userid']) {
+		setForumCookie('authtoken','');
+		setForumCookie('forum_userid','');
 	}
 	return $response;
 }
 
-function forumApiGetRequest ($path){
+function apiRequest ($method, $path, $data){
 	$url = "https://api.websitetoolbox.com/v1/api$path";
 	$curl = curl_init($url);
 	curl_setopt($curl, CURLOPT_HTTPHEADER, array(
 	      "x-api-key: ".FORUM_API_KEY
 	   ));
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-	$response = curl_exec($curl);
-	curl_close($curl);
-	$namedArray = json_decode($response);
-	return $namedArray;
-}
-
-function forumApiPostRequest ($path, $data){
-	$url = "https://api.websitetoolbox.com/v1/api$path";
-	$curl = curl_init($url);
-	curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-	      "x-api-key: ".FORUM_API_KEY
-	   ));
-	curl_setopt($curl, CURLOPT_POST, true);
-	curl_setopt($curl,CURLOPT_POSTFIELDS, json_encode($data));
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-	$response = curl_exec($curl);
-	curl_close($curl);
-	$namedArray = json_decode($response);
-	return $namedArray;
-}
-
-function forumApiDeleteRequest ($path){
-	$url = "https://api.websitetoolbox.com/v1/api$path";
-	$curl = curl_init($url);
-	curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-	      "x-api-key: ".FORUM_API_KEY
-	   ));
-	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+	if (strtoupper($method) == "POST") {
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl,CURLOPT_POSTFIELDS, json_encode($data));
+	} else if (strtoupper($method) == "DELETE") {
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+	}
 	$response = curl_exec($curl);
 	curl_close($curl);
 	$namedArray = json_decode($response);
