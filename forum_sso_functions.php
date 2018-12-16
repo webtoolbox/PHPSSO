@@ -39,8 +39,8 @@ function storeAuthToken ($user) {
 function logout () {
 	// calling printLogoutImage() in your code is also required
 	if(isset($_COOKIE['authtoken'])) {
-		setForumCookie('authtoken', '');
-		setForumCookie('forum_userid', '');
+		deleteCookie('authtoken');
+		deleteCookie('forum_userid');
 	}
 }
 
@@ -55,8 +55,8 @@ function printLoginImage () {
 }
 
 function printLogoutImage () {
-	if(isset($_COOKIE['authtoken'])) {
-		echo "<img src='".getDomain()."/register/logout?authtoken=".$_COOKIE['authtoken']."' border='0' width='1' height='1' alt=''>";
+	if(isset($_GET['authtoken'])) {
+		echo "<img src='".getDomain()."/register/logout?authtoken=".$_GET['authtoken']."' border='0' width='1' height='1' alt=''>";
 	}
 }
 
@@ -139,6 +139,13 @@ function setForumCookie ($name, $value) {
 	setcookie($name, $value, $expiration, "/");
 }
 
+function deleteCookie ($name) {
+	if (isset($_COOKIE[$name])) {
+		setcookie($name, '', time() - 3600, "/");
+		unset($_COOKIE[$name]);
+	}
+}
+
 // API functions: https://www.websitetoolbox.com/api/
 
 function getUser ($userId) {
@@ -154,8 +161,8 @@ function updateUser ($userId, $data) {
 function deleteUser ($userId) {
 	$response = apiRequest('DELETE', "/users/$userId");
 	if (isset($_COOKIE['forum_userid']) && $userId == $_COOKIE['forum_userid']) {
-		setForumCookie('authtoken','');
-		setForumCookie('forum_userid','');
+		deleteCookie('authtoken');
+		deleteCookie('forum_userid');
 	}
 	return $response;
 }
