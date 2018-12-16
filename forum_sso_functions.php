@@ -141,7 +141,7 @@ function setForumCookie ($name, $value) {
 
 function deleteCookie ($name) {
 	if (isset($_COOKIE[$name])) {
-		setcookie($name, '', time() - 3600, "/");
+		setcookie($name, '', 1, "/");
 		unset($_COOKIE[$name]);
 	}
 }
