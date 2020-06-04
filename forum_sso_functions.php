@@ -55,9 +55,7 @@ function printLoginImage () {
 }
 
 function printLogoutImage () {
-	if(isset($_GET['authtoken'])) {
-		echo "<img src='".getDomain()."/register/logout?authtoken=".$_GET['authtoken']."' border='0' width='1' height='1' alt=''>";
-	}
+	echo "<img src='".getDomain()."/register/logout' border='0' width='1' height='1' alt=''>";
 }
 
 function getDomain () {
