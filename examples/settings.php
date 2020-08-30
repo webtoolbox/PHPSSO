@@ -38,6 +38,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'update') {
   <ul>
     <li><a href="index.php">Home</a></li>
     <li><a href="<?php echo \WTForum\getAddress(); ?>">Forum</a></li>
+    <li><a href="forum.php">Embedded forum</a></li>
     <li><a href="signup.php">Sign up</a></li>
     <li><a href="login.php">Log in</a></li>
     <li><a href="logout.php">Log out</a></li>
