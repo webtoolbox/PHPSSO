@@ -46,10 +46,7 @@ function logout () {
 
 function printLoginImage () {
 	if(isset($_COOKIE['authtoken'])) {
-		$url = getDomain()."/register/dologin?authtoken=".$_COOKIE['authtoken'];
-		if (PERSISTENT_FORUM_SESSION) {
-			$url .= "&remember=1";
-		}
+		$url = getDomain()."/register/dologin?".getAuthParams();
 		echo "<img src='$url' border='0' width='1' height='1' alt=''>";
 	}
 }
@@ -93,12 +90,20 @@ function getAddress () {
 		} else {
 			$forumAddress .= "?";
 		}
-		$forumAddress .= "authtoken=".$_COOKIE['authtoken'];
-		if (PERSISTENT_FORUM_SESSION) {
-			$forumAddress .= "remember=1";
-		}
+		$forumAddress .= getAuthParams();
 	}
 	return $forumAddress;
+}
+
+function getAuthParams () {
+	$params = "";
+	if (isset($_COOKIE['authtoken'])) {
+		$params .= "authtoken=".$_COOKIE['authtoken'];
+	}
+	if (PERSISTENT_FORUM_SESSION) {
+		$params .= "remember=1";
+	}
+	return $params;
 }
 
 function httpRequest($path, $user){

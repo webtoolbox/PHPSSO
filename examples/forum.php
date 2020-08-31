@@ -25,7 +25,7 @@ require_once 'forum_sso_functions.php';
 	It uses the domain of the forum and passes the authtoken as a parameter.
  	-->
 	<!--Begin Website Toolbox Forum Embed Code-->
-	<div id="wtEmbedCode"><script type="text/javascript" id="embedded_forum" src="<?php echo \WTForum\getDomain(); ?>/js/mb/embed.js?authtoken=<?php if (isset($_COOKIE['authtoken'])) echo $_COOKIE['authtoken']; ?>"></script>
+	<div id="wtEmbedCode"><script type="text/javascript" id="embedded_forum" src="<?php echo \WTForum\getDomain(); ?>/js/mb/embed.js?<?php echo \WTForum\getAuthParams(); ?>"></script>
 	<noscript><a href="<?php echo \WTForum\getDomain(); ?>">Forum</a></noscript></div>
 	<!--End Website Toolbox Forum Embed Code-->
 </body>
