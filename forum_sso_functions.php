@@ -44,6 +44,8 @@ function logout () {
 	}
 }
 
+// You don't need to use this if you're including the authtoken in the forum link on your website
+// Due to third-party cookie blocking in some browsers, the image tag approach will only work in those browsers if you're using a custom domain name (ie: https://forums.yoursite.com)
 function printLoginImage () {
 	if(isset($_COOKIE['authtoken'])) {
 		$url = getDomain()."/register/dologin?".getAuthParams();
@@ -51,6 +53,8 @@ function printLoginImage () {
 	}
 }
 
+// You don't need to use this if you're redirecting the user to the forum log out page when they log out from your website. See examples/logout.php
+// Due to third-party cookie blocking in some browsers, the image tag approach will only work in those browsers if you're using a custom domain name (ie: https://forums.yoursite.com)
 function printLogoutImage () {
 	if(isset($_GET['authtoken'])) {
 		echo "<img src='".getDomain()."/register/logout?authtoken=".$_GET['authtoken']."' border='0' width='1' height='1' alt=''>";
@@ -121,7 +125,7 @@ function httpRequest($path, $user){
 			if ($value === NULL)
 			 $user[$key] = '';
 		}
-		$parameters = http_build_query($user, NULL, '&');
+		$parameters = http_build_query($user, "", '&');
 	}
 
 	$url = getDomain().$path."type=json&apikey=".FORUM_API_KEY."&".$parameters;
@@ -154,7 +158,7 @@ function deleteCookie ($name) {
 // API functions: https://www.websitetoolbox.com/api/
 
 function getUser ($userId) {
-	$user = apiRequest('GET', "/users/$userId");
+	$user = apiRequest('GET', "/users/$userId", NULL);
 	return $user;
 }
 
@@ -164,7 +168,7 @@ function updateUser ($userId, $data) {
 }
 
 function deleteUser ($userId) {
-	$response = apiRequest('DELETE', "/users/$userId");
+	$response = apiRequest('DELETE', "/users/$userId", NULL);
 	if (isset($_COOKIE['forum_userid']) && $userId == $_COOKIE['forum_userid']) {
 		deleteCookie('authtoken');
 		deleteCookie('forum_userid');
@@ -183,7 +187,7 @@ function apiRequest ($method, $path, $data){
 		curl_setopt($curl, CURLOPT_POST, true);
 		curl_setopt($curl,CURLOPT_POSTFIELDS, json_encode($data));
 	} else if (strtoupper($method) == "DELETE") {
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
 	}
 	$response = curl_exec($curl);
 	curl_close($curl);
