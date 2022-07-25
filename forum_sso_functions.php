@@ -105,7 +105,7 @@ function getAuthParams () {
 		$params .= "authtoken=".$_COOKIE['authtoken'];
 	}
 	if (PERSISTENT_FORUM_SESSION) {
-		$params .= "remember=1";
+		$params .= "&remember=1";
 	}
 	return $params;
 }
@@ -145,7 +145,7 @@ function setForumCookie ($name, $value) {
 	} else {
 		$expiration = 0;
 	}
-	setcookie($name, $value, $expiration, "/");
+	setcookie($name, $value, $expiration, "/", $_SERVER['HTTP_HOST']);
 }
 
 function deleteCookie ($name) {
@@ -180,7 +180,8 @@ function apiRequest ($method, $path, $data){
 	$url = "https://api.websitetoolbox.com/v1/api$path";
 	$curl = curl_init($url);
 	curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-	      "x-api-key: ".FORUM_API_KEY
+	      "x-api-key: ".FORUM_API_KEY,
+		  'Content-Type: application/json',
 	   ));
 	curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 	if (strtoupper($method) == "POST") {

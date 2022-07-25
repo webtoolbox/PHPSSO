@@ -1,7 +1,7 @@
 <?php
 require_once 'forum_sso_functions.php';
 
-if (isset($_GET['action']) && $_GET['action'] == 'login') {
+if (isset($_POST['action']) && $_POST['action'] == 'login') {
   // Your code to log the user into your website goes here
 
   $user = array();
@@ -22,15 +22,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'login') {
 <body>
 	<h2>Log in</h2>
   <p>Navigation:</p>
-  <ul>
-    <li><a href="index.php">Home</a></li>
-    <li><a href="<?php echo \WTForum\getAddress(); ?>">Forum</a></li>
-    <li><a href="signup.php">Sign up</a></li>
-    <li><a href="login.php">Log in</a></li>
-    <li><a href="logout.php">Log out</a></li>
-    <li><a href="account.php">Account</a></li>
-    <li><a href="delete.php">Delete</a></li>
-  </ul>
+  <?php include('header.php'); ?>
 <form method="post">
   <p><input type="text" name="username" placeholder="Username or Email"></p>
   <p><input type="text" name="password" placeholder="Password"></p>
