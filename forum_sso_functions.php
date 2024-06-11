@@ -176,6 +176,12 @@ function deleteUser ($userId) {
 	return $response;
 }
 
+/*
+ * Examples:
+ * response = apiRequest("GET", "/categories", null);
+ * response = apiRequest("POST", "/categories", array("title" => "Test Category"));
+ * API Documentation: https://www.websitetoolbox.com/api/
+ */
 function apiRequest ($method, $path, $data){
 	$url = "https://api.websitetoolbox.com/v1/api$path";
 	$curl = curl_init($url);
